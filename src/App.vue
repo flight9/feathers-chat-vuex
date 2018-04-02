@@ -18,11 +18,21 @@ export default {
   },
   watch: {
     // When the user is set, redirect to the Chat page.
+    // ZM: Add router condition here for wechat
     user (newVal) {
+      const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
       if (newVal === undefined) {
-        this.$router.replace({name: 'Login'})
+        if (!inWechat) {
+          this.$router.replace({name: 'Login'})
+        } else {
+          this.$router.replace({name: 'Launch', params: { code: 'start' }})
+        }
       } else {
-        this.$router.replace({name: 'Chat'})
+        if (newVal) { // TODO: By newVal.active
+          this.$router.replace({name: 'Chat'})
+        } else {
+          this.$router.replace({name: 'Wait'})
+        }
       }
     }
   },

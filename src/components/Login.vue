@@ -51,7 +51,9 @@ export default {
     },
 
     onSubmit (email, password) {
-      this.authenticate({strategy: 'local', email, password})
+      // TODO: Replace test openid with real one from properties.
+      var openid = '22222333333'
+      this.authenticate({strategy: 'local', email, password, openid})
         // Just use the returned error instead of mapping it from the store.
         .catch(error => {
           // Convert the error to a plain object and add a message.
