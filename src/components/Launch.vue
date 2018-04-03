@@ -5,39 +5,42 @@
         <img class="logo center-item"
           src="http://feathersjs.com/img/feathers-logo-wide.png"
           alt="Feathers Logo">
-        <h3 class="title">Chat</h3>
+        <h3 class="title">Launch</h3>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-12 push-4-tablet col-4-tablet">
-        <div class="row">
-          <div class="col-12">
-            <router-link as="a" :to="{name: 'Login'}" class="button button-primary block login">Login</router-link>
-          </div>
-        </div>
 
-        <div class="row">
-          <div class="col-12">
-            <router-link as="a" :to="{name: 'Signup'}" class="button button-primary block signup">Signup</router-link>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-12">
-            <router-link as="a" :to="{name: 'Launch', query: {code:'start'}}" class="button button-primary block login">Launch</router-link>
-          </div>
-        </div>
-      </div>
     </div>
 
   </main>
 </template>
 
 <script>
-export default {
-  name: 'home'
-}
+  import URL from 'url-parse'
+
+  export default {
+    name: 'launch',
+    data () {
+      return {
+        code: `nothing`
+      }
+    },
+    mounted () {
+      // NOTE: When use URL, '?code=xxxx' must before '#/Launch'
+      let url = new URL(window.location.href, '', true)
+      console.log(`url`, url)
+      this.code = url.query.code || this.$route.query.code
+
+      if (this.code === 'start') {
+        //
+        console.log('code start')
+      } else {
+        //
+        console.log('code others')
+      }
+    }
+  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

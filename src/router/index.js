@@ -4,6 +4,7 @@ import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Signup from '@/components/Signup'
 import Chat from '@/components/Chat/Chat'
+import Launch from '@/components/Launch'
 
 Vue.use(Router)
 
@@ -12,6 +13,7 @@ export default new Router({
     { path: '', name: 'Home', component: Home },
     { path: '/login', name: 'Login', component: Login },
     { path: '/signup', name: 'Signup', component: Signup },
-    { path: '/chat', name: 'Chat', component: Chat }
+    { path: '/chat', name: 'Chat', component: Chat },
+    { path: '/launch', name: 'Launch', component: Launch }
   ]
 })

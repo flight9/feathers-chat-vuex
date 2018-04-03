@@ -25,7 +25,7 @@ export default {
         if (!inWechat) {
           this.$router.replace({name: 'Login'})
         } else {
-          this.$router.replace({name: 'Launch', params: { code: 'start' }})
+          this.$router.replace({name: 'Launch', query: {code: 'start'}})
         }
       } else {
         if (newVal) { // TODO: By newVal.active
