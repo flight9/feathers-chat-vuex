@@ -21,9 +21,10 @@ export default {
     // ZM: Add router condition here for wechat
     user (newVal) {
       const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-      if (newVal === undefined) {
+      console.log('User newVal:', newVal)
+      if (!newVal) {
         if (!inWechat) {
-          this.$router.replace({name: 'Login'})
+          this.$router.replace({name: 'Home'})
         } else {
           this.$router.replace({name: 'Launch', query: {code: 'start'}})
         }
