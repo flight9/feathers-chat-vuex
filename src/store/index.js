@@ -11,6 +11,7 @@ export default new Vuex.Store({
   plugins: [
     service('users'),
     service('messages'),
+    service('wxauth'),
 
     auth({
       userService: 'users'

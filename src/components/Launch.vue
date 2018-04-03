@@ -17,6 +17,7 @@
 </template>
 
 <script>
+  import {mapGetters, mapActions} from 'vuex'
   import URL from 'url-parse'
 
   export default {
@@ -33,11 +34,32 @@
       this.code = url.query.code || this.$route.query.code
 
       if (this.code === 'start') {
-        //
         console.log('code start')
+        this.wxGetUrl()
       } else {
         //
         console.log('code others')
+      }
+    },
+    computed: {
+      ...mapGetters('wxauth', {
+        wxauth: 'list'
+      })
+    },
+    methods: {
+      ...mapActions('wxauth', {
+        findWxauth: 'find'
+      }),
+      wxGetUrl () {
+        this.findWxauth({
+          query: {
+            type: 'url',
+            $limit: 9999
+          }
+        }).then((page) => {
+          console.log(`page`, page)
+          // window.location.href = this.wxauth[0].url
+        })
       }
     }
   }
