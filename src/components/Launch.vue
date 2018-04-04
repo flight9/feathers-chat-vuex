@@ -34,11 +34,11 @@
       this.code = url.query.code || this.$route.query.code
 
       if (this.code === 'start') {
-        console.log('code start')
+        console.log('Code start:')
         this.wxGetUrl()
       } else {
-        //
-        console.log('code others')
+        console.log('Code others:')
+        this.wxGetToken()
       }
     },
     computed: {
@@ -58,19 +58,46 @@
             $limit: 9999
           }
         }).then((page) => {
-          console.log(`page`, page)
-          // window.location.href = this.wxauth[0].url
-
-          this.authenticate({strategy: 'jwt', accessToken: page[0].access_token})
-            .catch(error => {
-              // Convert the error to a plain object and add a message.
-              let type = error.className
-              error = Object.assign({}, error)
-              error.message = (type === 'not-authenticated')
-                ? 'Incorrect email or password.'
-                : 'An error prevented login.'
-              console.log('Launch err:', error)
-            })
+          console.log(`Response page:`, page)
+          if (page.length > 0 && page[0].status === 200) {
+            let authUrl = page[0].result.url
+            window.location.href = authUrl
+            // console.info('Auth url:', authUrl)
+          } else {
+            console.error('Err in wxGetUrl response')
+          }
+        })
+      },
+      wxGetToken () {
+        this.findWxauth({
+          query: {
+            type: 'token',
+            code: this.code,
+            $limit: 9999
+          }
+        }).then((page) => {
+          console.log(`Response page:`, page)
+          if (page.length > 0 && page[0].status === 200) {
+            var result = page[0].result
+            if (result.found) {
+              // Re-authenticate with jwt
+              this.authenticate({strategy: 'jwt', accessToken: result.access_token})
+                .catch(error => {
+                  // Convert the error to a plain object and add a message.
+                  let type = error.className
+                  error = Object.assign({}, error)
+                  error.message = (type === 'not-authenticated')
+                    ? 'Incorrect email or password.'
+                    : 'An error prevented login.'
+                  console.log('Launch err:', error)
+                })
+            } else {
+              // (Not found) Redirect to Signup page with openid
+              this.$router.replace({name: 'Signup', params: {openid: result.openid}})
+            }
+          } else {
+            console.error('Err in wxGetToken response')
+          }
         })
       }
     }
