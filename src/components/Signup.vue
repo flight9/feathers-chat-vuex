@@ -45,7 +45,6 @@
 
 <script>
 import { mapMutations, mapActions } from 'vuex'
-import global_ from '@/components/global'
 
 export default {
   data () {
@@ -55,8 +54,13 @@ export default {
       error: undefined
     }
   },
+  props: {
+    openid: {
+      default: undefined
+    }
+  },
   mounted () {
-    console.log('Signup userInfo:', global_.userInfo)
+    console.log('Signup openid:', this.openid)
   },
   methods: {
     dismissError () {
@@ -67,8 +71,8 @@ export default {
       this.dismissError()
 
       let user = {email, password, active: false}
-      if (global_.userInfo.openid) {
-        user.openid = global_.userInfo.openid
+      if (this.openid) {
+        user.openid = this.openid
       }
 
       // Automatically log the user in after successful signup.
