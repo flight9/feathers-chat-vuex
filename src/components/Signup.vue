@@ -45,6 +45,7 @@
 
 <script>
 import { mapMutations, mapActions } from 'vuex'
+import global_ from '@/components/global'
 
 export default {
   data () {
@@ -54,7 +55,9 @@ export default {
       error: undefined
     }
   },
-
+  mounted () {
+    console.log('Signup userInfo:', global_.userInfo)
+  },
   methods: {
     dismissError () {
       this.error = undefined
@@ -63,8 +66,13 @@ export default {
     onSubmit (email, password) {
       this.dismissError()
 
+      let user = {email, password, active: false}
+      if (global_.userInfo.openid) {
+        user.openid = global_.userInfo.openid
+      }
+
       // Automatically log the user in after successful signup.
-      this.createUser({ email, password })
+      this.createUser(user)
         .then(response => this.authenticate({strategy: 'local', email, password}))
         // Just use the returned error instead of mapping it from the store.
         .catch(error => {

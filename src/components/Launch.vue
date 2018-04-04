@@ -19,6 +19,7 @@
 <script>
   import {mapGetters, mapActions} from 'vuex'
   import URL from 'url-parse'
+  import global_ from '@/components/global'
 
   export default {
     name: 'launch',
@@ -93,7 +94,8 @@
                 })
             } else {
               // (Not found) Redirect to Signup page with openid
-              this.$router.replace({name: 'Signup', params: {openid: result.openid}})
+              global_.userInfo.openid = result.openid
+              this.$router.replace({name: 'Signup'})
             }
           } else {
             console.error('Err in wxGetToken response')

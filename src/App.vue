@@ -20,14 +20,13 @@ export default {
     // When the user is set, redirect to the Chat page.
     // ZM: Add router condition here for wechat
     user (newVal) {
-      const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
+      // const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
       console.log('User newVal:', newVal)
       if (!newVal) {
-        if (!inWechat) {
-          this.$router.replace({name: 'Home'})
-        } else {
-          this.$router.replace({name: 'Launch', query: {code: 'start'}})
-        }
+        // After logout
+        this.$router.replace({name: 'Home'})
+        // TODO: Do we need automatic jump?
+        // this.$router.replace({name: 'Launch', query: {code: 'start'}})
       } else {
         if (newVal) { // TODO: By newVal.active
           this.$router.replace({name: 'Chat'})
