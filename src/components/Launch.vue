@@ -50,6 +50,7 @@
       ...mapActions('wxauth', {
         findWxauth: 'find'
       }),
+      ...mapActions('auth', ['authenticate']),
       wxGetUrl () {
         this.findWxauth({
           query: {
@@ -59,6 +60,17 @@
         }).then((page) => {
           console.log(`page`, page)
           // window.location.href = this.wxauth[0].url
+
+          this.authenticate({strategy: 'jwt', accessToken: page[0].access_token})
+            .catch(error => {
+              // Convert the error to a plain object and add a message.
+              let type = error.className
+              error = Object.assign({}, error)
+              error.message = (type === 'not-authenticated')
+                ? 'Incorrect email or password.'
+                : 'An error prevented login.'
+              console.log('Launch err:', error)
+            })
         })
       }
     }
