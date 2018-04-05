@@ -5,7 +5,8 @@
         <img class="logo center-item"
           src="http://feathersjs.com/img/feathers-logo-wide.png"
           alt="Feathers Logo">
-        <h3 class="title">Launch</h3>
+        <h1 class="title">Launch</h1>
+        <h3>code: {{code}}</h3>
       </div>
     </div>
 
@@ -34,8 +35,13 @@
       this.code = url.query.code || this.$route.query.code
 
       if (this.code === 'start') {
-        console.log('Code start:')
-        this.wxGetUrl()
+        setTimeout(() => {
+          if (this.$store.state.auth.user) {
+            return // To avoid login twice
+          }
+          console.log('Code start:')
+          this.wxGetUrl()
+        }, 2000)
       } else {
         console.log('Code others:')
         this.wxGetToken()
@@ -61,7 +67,10 @@
           console.log(`Response page:`, page)
           if (page.length > 0 && page[0].status === 200) {
             let authUrl = page[0].result.url
-            window.location.href = authUrl
+            console.log('wxGetUrl callback')
+            if (!this.$store.state.auth.user) { // To avoid login twice
+              window.location.href = authUrl
+            }
             // console.info('Auth url:', authUrl)
           } else {
             console.error('Err in wxGetUrl response')

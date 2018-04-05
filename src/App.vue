@@ -24,8 +24,8 @@ export default {
       console.log('User newVal:', newVal)
       if (!newVal) {
         // After logout
-        this.$router.replace({name: 'Home'})
-        // TODO: Do we need automatic jump?
+        this.$router.replace({name: 'Login'})
+        // TODO: Do we need automatic jump here?
         // this.$router.replace({name: 'Launch', query: {code: 'start'}})
       } else {
         if (newVal) { // TODO: By newVal.active
@@ -41,6 +41,8 @@ export default {
       if (!error.message.includes('Could not find stored JWT')) {
         console.error(error)
       }
+    }).then(res => {
+      console.log('Auth res:', res)
     })
   }
 }
