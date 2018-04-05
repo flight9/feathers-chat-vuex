@@ -23,10 +23,12 @@
         </fieldset>
 
         <button type="submit" class="button button-primary block login">
-          Login
+          {{openid? 'Bind':'Login'}}
         </button>
 
-        <router-link as="button" :to="{name: 'Home'}" class="button button-secondary block">Back</router-link>
+        <router-link as="button" :to="{name: 'Signup', params: {openid}}" class="button button-secondary block">
+          Signup {{openid? ' via wechat':''}}
+        </router-link>
       </form>
     </div>
   </div>
@@ -43,6 +45,14 @@ export default {
       password: undefined,
       error: undefined
     }
+  },
+  props: {
+    openid: {
+      default: undefined
+    }
+  },
+  mounted () {
+    console.log('Login openid:', this.openid)
   },
   methods: {
     dismissError () {

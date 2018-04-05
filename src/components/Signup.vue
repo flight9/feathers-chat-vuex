@@ -33,10 +33,12 @@
         </fieldset>
 
         <button type="submit" class="button button-primary block signup">
-          Signup
+          Signup {{openid? ' via wechat':''}}
         </button>
 
-        <router-link as="button" :to="{name: 'Home'}" class="button button-secondary block">Back</router-link>
+        <router-link as="button" :to="{name: 'Login', params: {openid}}" class="button button-secondary block">
+          {{openid? 'Bind':'Login'}}
+        </router-link>
       </form>
     </div>
   </div>
