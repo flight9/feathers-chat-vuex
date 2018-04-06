@@ -31,17 +31,22 @@
     mounted () {
       // NOTE: When use URL, '?code=xxxx' must before '#/Launch'
       let url = new URL(window.location.href, '', true)
-      console.log(`url`, url)
       this.code = url.query.code || this.$route.query.code
+      // console.log(`url`, url)
 
       if (this.code === 'start') {
-        setTimeout(() => {
-          if (this.$store.state.auth.user) {
-            return // To avoid login twice
+        // Authenticate only for wechat to avoid login twice.
+        // (Skip Authenticate in App.vue)
+        this.authenticate().catch(err => {
+          // TODO: Is token expired an error and show here?
+          console.log('Launch auth err:', err)
+        }).then(res => {
+          console.log('Launch auth res', res)
+          if (!res) {
+            console.log('Code start:')
+            this.wxGetUrl()
           }
-          console.log('Code start:')
-          this.wxGetUrl()
-        }, 2000)
+        })
       } else {
         console.log('Code others:')
         this.wxGetToken()
@@ -68,9 +73,7 @@
           if (page.length > 0 && page[0].status === 200) {
             let authUrl = page[0].result.url
             console.log('wxGetUrl callback')
-            if (!this.$store.state.auth.user) { // To avoid login twice
-              window.location.href = authUrl
-            }
+            window.location.href = authUrl
             // console.info('Auth url:', authUrl)
           } else {
             console.error('Err in wxGetUrl response')

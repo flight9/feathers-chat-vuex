@@ -20,7 +20,6 @@ export default {
     // When the user is set, redirect to the Chat page.
     // ZM: Add router condition here for wechat
     user (newVal) {
-      // const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
       console.log('User newVal:', newVal)
       if (!newVal) {
         // After logout
@@ -37,13 +36,16 @@ export default {
     }
   },
   mounted () {
-    this.$store.dispatch('auth/authenticate').catch(error => {
-      if (!error.message.includes('Could not find stored JWT')) {
-        console.error(error)
-      }
-    }).then(res => {
-      console.log('Auth res:', res)
-    })
+    const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
+    if (!inWechat) {
+      this.$store.dispatch('auth/authenticate').catch(error => {
+        if (!error.message.includes('Could not find stored JWT')) {
+          console.error(error)
+        }
+      }).then(res => {
+        console.log('App auth res:', res)
+      })
+    }
   }
 }
 </script>
