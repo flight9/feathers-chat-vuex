@@ -42,6 +42,7 @@ export default {
     }).then(res => {
       console.log('App auth res:', res)
       // In wechat, we need automatically jump to start launch
+      // but still a problem when wx server callback: jump again to Launch?
       if (!res && inWechat) {
         this.$router.replace({name: 'Launch', query: {code: 'start'}})
       }
