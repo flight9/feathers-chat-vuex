@@ -34,9 +34,9 @@ export default {
     }
   },
   mounted () {
-    // console.info('currentRoute:', this.$router.currentRoute)
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-    const isRouteLaunch = (this.$router.currentRoute === 'Launch')
+    const isRouteLaunch = (this.$router.currentRoute.name === 'Launch')
+    console.info('isRouteLaunch:', isRouteLaunch)
     if (!isRouteLaunch) {
       this.$store.dispatch('auth/authenticate').catch(error => {
         if (!error.message.includes('Could not find stored JWT')) {
