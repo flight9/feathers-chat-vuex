@@ -69,11 +69,12 @@ export default {
         // Just use the returned error instead of mapping it from the store.
         .catch(error => {
           // Convert the error to a plain object and add a message.
+          console.log('Bind err:', error)
           let type = error.className
           error = Object.assign({}, error)
-          error.message = (type === 'not-authenticated')
-            ? 'Incorrect email or password.'
-            : 'An error prevented login.'
+          if (type === 'not-authenticated') {
+            error.message = 'Incorrect email or password.'
+          }
           this.error = error
         })
     },
