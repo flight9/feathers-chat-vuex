@@ -34,19 +34,24 @@ export default {
     }
   },
   mounted () {
+    // console.info('currentRoute:', this.$router.currentRoute)
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-    this.$store.dispatch('auth/authenticate').catch(error => {
-      if (!error.message.includes('Could not find stored JWT')) {
-        console.error(error)
-      }
-    }).then(res => {
-      console.log('App auth res:', res)
-      // In wechat, we need automatically jump to start launch
-      // but still a problem when wx server callback: jump again to Launch?
-      if (!res && inWechat) {
-        this.$router.replace({name: 'Launch', query: {code: 'start'}})
-      }
-    })
+    const isRouteLaunch = (this.$router.currentRoute === 'Launch')
+    if (!isRouteLaunch) {
+      this.$store.dispatch('auth/authenticate').catch(error => {
+        if (!error.message.includes('Could not find stored JWT')) {
+          console.error(error)
+        }
+      }).then(res => {
+        console.log('App auth res:', res)
+        // In wechat, should we need automatically jump to start launch?
+        // It may cause a problem when wx server callback: jump again to Launch,
+        // isRouteLaunch above is used to solve that problem.
+        if (!res && inWechat) {
+          // this.$router.replace({name: 'Launch', query: {code: 'start'}})
+        }
+      })
+    }
   }
 }
 </script>
