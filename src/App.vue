@@ -24,28 +24,28 @@ export default {
       if (!newVal) {
         // After logout
         this.$router.replace({name: 'Login'})
-        // TODO: Do we need automatic jump here?
-        // this.$router.replace({name: 'Launch', query: {code: 'start'}})
       } else {
-        if (newVal) { // TODO: By newVal.active
+        if (newVal) { // TODO: By user.active
           this.$router.replace({name: 'Chat'})
         } else {
-          this.$router.replace({name: 'Wait'})
+          this.$router.replace({name: 'Wait'}) // for block user
         }
       }
     }
   },
   mounted () {
     const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-    if (!inWechat) {
-      this.$store.dispatch('auth/authenticate').catch(error => {
-        if (!error.message.includes('Could not find stored JWT')) {
-          console.error(error)
-        }
-      }).then(res => {
-        console.log('App auth res:', res)
-      })
-    }
+    this.$store.dispatch('auth/authenticate').catch(error => {
+      if (!error.message.includes('Could not find stored JWT')) {
+        console.error(error)
+      }
+    }).then(res => {
+      console.log('App auth res:', res)
+      // In wechat, we need automatically jump to start launch
+      if (!res && inWechat) {
+        this.$router.replace({name: 'Launch', query: {code: 'start'}})
+      }
+    })
   }
 }
 </script>
