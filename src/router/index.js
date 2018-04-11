@@ -15,7 +15,7 @@ export default new Router({
     { path: '/login', name: 'Login', component: Login, props: true },
     { path: '/signup', name: 'Signup', component: Signup, props: true },
     { path: '/chat', name: 'Chat', component: Chat },
-    { path: '/launch', name: 'Launch', component: Launch },
+    { path: '/wx', name: 'Launch', component: Launch },
     { path: '/wait', name: 'Wait', component: Wait }
   ]
 })
