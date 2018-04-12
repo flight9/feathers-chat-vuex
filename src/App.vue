@@ -45,7 +45,12 @@ export default {
       }).then(res => {
         console.log('App auth res:', res)
         // In wechat, should we need automatically jump to start launch?
-        // It may cause a problem when wx server callback: jump again to Launch,
+        // If we use codes below to jump, then remove the authenticate() invoking
+        // in Launch.vue, and make wechat menu entry pointed to '/' not 'Launch' route.
+        // Optinon 1 to use code below; Option 2 make wechat menu entry pointed to
+        // '/launch?code=start' and invoke app.authenticate() there too(without code below).
+        // Codes below may cause a problem when wx server callback(like refresh):
+        // it jumps again to Launch,
         // isRouteLaunch above is used to solve that problem.
         if (!res && inWechat) {
           // this.$router.replace({name: 'Launch', query: {code: 'start'}})

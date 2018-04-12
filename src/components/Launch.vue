@@ -41,7 +41,7 @@
           // TODO: Is token expired an error and show here?
           console.log('Launch auth err:', err)
         }).then(res => {
-          console.log('Launch auth res', res)
+          console.log('Launch auth res:', res)
           if (!res) {
             console.log('Code start:')
             this.wxGetUrl()
