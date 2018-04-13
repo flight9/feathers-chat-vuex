@@ -44,12 +44,12 @@
         }).then(res => {
           console.log('Launch auth res:', res)
           if (!res) {
-            console.log('Code start:')
+            console.log('Launch start')
             this.wxGetUrl()
           }
         })
       } else {
-        console.log('Code others:')
+        console.log('Launch callback')
         this.wxGetToken()
       }
     },
