@@ -37,6 +37,7 @@
       if (this.code === 'start') {
         // Authenticate only for wechat to avoid login twice.
         // (Skip Authenticate in App.vue)
+        console.info('Launch invoke authenticate()')
         this.authenticate().catch(err => {
           // TODO: Is token expired an error and show here?
           console.log('Launch auth err:', err)
