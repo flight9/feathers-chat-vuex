@@ -7,6 +7,7 @@
 <script>
 import './styles/base.css'
 import './styles/chat.css'
+import wx from 'weixin-js-sdk'
 
 export default {
   name: 'app',
@@ -25,6 +26,9 @@ export default {
         // After logout
         this.$router.replace({name: 'Login'})
       } else {
+        // TODO: Mike: Do jsconfig ONLY after user logged in
+        // move this.wxStartJsconfig() here
+
         if (newVal) { // TODO: By user.active
           this.$router.replace({name: 'Chat'})
         } else {
@@ -63,9 +67,46 @@ export default {
           // this.$router.replace({name: 'Launch', query: {code: 'start'}})
         }
       })
-    }
-    else {
+    } else {
       console.info('App skip authenticate()')
+    }
+
+    this.wxStartJsconfig()
+  },
+  methods: {
+    wxStartJsconfig () {
+      var params = {
+        query: {
+          type: 'jsconfig',
+          url: window.location.href.split('#')[0],
+          $limit: 9999
+        }
+      }
+      console.info('App start jsconfig')
+      this.$store.dispatch('wxauth/find', params).catch(error => {
+        console.error(error)
+      }).then(page => {
+        if (page.length > 0 && page[0].status === 200) {
+          let cfg = page[0].result
+          console.info('App get jsconfig:', cfg)
+          wx.config({
+            debug: true, // true 开启调试模式。
+            appId: cfg.appId,
+            timestamp: cfg.timestamp,
+            nonceStr: cfg.nonceStr,
+            signature: cfg.signature,
+            jsApiList: ['chooseImage', 'uploadImage', 'scanQRCode', 'getLocalImgData'] // 看具体要调用的接口
+          })
+          wx.error(function (res) {
+            alert(res.errMsg)
+          })
+          wx.ready(function () {
+            // This will always be called even when there is an error
+          })
+        } else {
+          console.error('Err in jsconfig response')
+        }
+      })
     }
   }
 }
