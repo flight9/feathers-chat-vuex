@@ -26,7 +26,7 @@ export default {
         // After logout
         this.$router.replace({name: 'Login'})
       } else {
-        // TODO: Mike: Do jsconfig ONLY after user logged in
+        // TODO: Mike: Do jsconfig ONLY after user logged in && ONLY inside Wechat
         // move this.wxStartJsconfig() here
 
         if (newVal) { // TODO: By user.active

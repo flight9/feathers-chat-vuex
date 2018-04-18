@@ -28,6 +28,13 @@
             <router-link as="a" :to="{name: 'Launch', query: {code:'start'}}" class="button button-primary block login">Launch</router-link>
           </div>
         </div>
+
+        <div class="row">
+          <div class="col-12">
+            <button @click="takePhoto">Take a photo</button>
+            <img v-show="localId" height="40px" width="40px" :src="localId"/>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -35,9 +42,61 @@
 </template>
 
 <script>
-export default {
-  name: 'home'
-}
+  import wx from 'weixin-js-sdk'
+  export default {
+    name: 'home',
+    data () {
+      return {
+        localId: undefined
+      }
+    },
+    methods: {
+      takePhoto () {
+        var that = this
+
+        wx.chooseImage({
+          count: 1, // 默认9
+          sizeType: 'compressed', // 'original', 'compressed'
+          sourceType: ['camera'], // 'album', 'camera'
+          success: function (res) {
+            var localId = res.localIds[0] // localId 可以作为 img 标签的 src 属性显示图片
+            uploadPhoto(localId)
+          },
+          fail: function (res) {
+            alert(res.message)
+          }
+        })
+
+        function uploadPhoto (localId) {
+          wx.uploadImage({
+            localId,
+            isShowProgressTips: 1, // 显示进度提示
+            success: function (res) {
+              // Determin if the client are using ios wkwebview
+              if (window.__wxjs_is_wkwebview === true) {
+                // new ios and wechat
+                wx.getLocalImgData({
+                  localId, // 图片的localID
+                  success: function (res) {
+                    that.localId = res.localData // localData是图片的base64数据，可以用img标签显示
+                  }
+                })
+              } else {
+                // android and old ios
+                that.localId = localId
+              }
+              var serverId = res.serverId
+              that.$emit('success', {serverId, localId})
+            },
+            fail: function (res) {
+              var message = res.errMsg
+              that.$emit('fail', {message})
+            }
+          })
+        }
+      }
+    }
+  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
