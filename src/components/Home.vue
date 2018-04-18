@@ -63,7 +63,7 @@
             uploadPhoto(localId)
           },
           fail: function (res) {
-            alert(res.message)
+            alert('ChooseImage Err:' + res.message)
           }
         })
 
