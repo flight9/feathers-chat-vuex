@@ -84,7 +84,7 @@ export default {
       }
       console.info('App start jsconfig')
       this.$store.dispatch('wxauth/find', params).catch(error => {
-        console.error(error)
+        console.error('wxauth/find', error)
       }).then(page => {
         if (page.length > 0 && page[0].status === 200) {
           let cfg = page[0].result
@@ -98,7 +98,7 @@ export default {
             jsApiList: ['chooseImage', 'uploadImage', 'scanQRCode', 'getLocalImgData'] // 看具体要调用的接口
           })
           wx.error(function (res) {
-            alert(res.errMsg)
+            alert('wx.error:' + res.errMsg)
           })
           wx.ready(function () {
             // This will always be called even when there is an error
