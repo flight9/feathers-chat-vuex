@@ -34,6 +34,10 @@ export default {
         } else {
           this.$router.replace({name: 'Wait'}) // for block user
         }
+
+        // Future redirect simulating
+        console.info('App user appVersion:', newVal.appVersion)
+        alert('appVersion' + newVal.appVersion)
       }
     }
   },
