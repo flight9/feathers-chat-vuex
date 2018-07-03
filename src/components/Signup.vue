@@ -32,6 +32,27 @@
             required>
         </fieldset>
 
+        <fieldset>
+          <input class="block"
+                 v-model="mobile"
+                 type="text"
+                 name="mobile"
+                 placeholder="mobile"
+                 required>
+        </fieldset>
+
+        <fieldset>
+          <input class="block"
+                 v-model="captcha"
+                 type="text"
+                 name="captcha"
+                 placeholder="captcha"
+                 required>
+          <button type="button" class="button button-primary" :disabled="disableCaptcha" @click="sendCaptcha">
+            {{btnCaptcha}}
+          </button>
+        </fieldset>
+
         <button type="submit" class="button button-primary block signup">
           Signup {{openid? ' via wechat':''}}
         </button>
@@ -48,11 +69,20 @@
 <script>
 import { mapMutations, mapActions } from 'vuex'
 
+const WAIT_SECS = 60
+const SEND_CAPTCHA = 'Send Captcha'
+
 export default {
   data () {
     return {
       email: undefined,
       password: undefined,
+      mobile: undefined,
+      captcha: undefined,
+      seconds: 0,
+      timer: 0,
+      btnCaptcha: SEND_CAPTCHA,
+      disableCaptcha: false,
       error: undefined
     }
   },
@@ -65,12 +95,51 @@ export default {
     console.log('Signup openid:', this.openid)
   },
   methods: {
+    ...mapActions('smscode', {
+      sendSmsCode: 'create'
+    }),
     dismissError () {
       this.error = undefined
       this.clearCreateError()
     },
+    validMobile (number) {
+      if (!number) return false
+      return (/(^(13\d|15[^4,\D]|17[13678]|18\d)\d{8}|170[^346,\D]\d{7})$/.test(number))
+    },
+    sendCaptcha () {
+      var mobile = this.mobile
+      if (!this.validMobile(mobile)) {
+        alert('Error: wrong format of mobile!')
+        return
+      }
+      this.disableCaptcha = true
+      this.timer = setInterval(this.updateButton, 1000)
+      this.sendSmsCode({mobile}).then(r => {
+        console.log('SendSmsCode ok:', r)
+      }).catch(e => {
+        if (e.MyErr) {
+          alert(e.MyErr.msg)
+        } else {
+          console.log('SendSmsCode Err:', e)
+        }
+      })
+    },
+    updateButton () {
+      if (++this.seconds < WAIT_SECS) {
+        this.btnCaptcha = 'Wait (' + (WAIT_SECS - this.seconds) + ')s'
+      } else {
+        this.seconds = 0; clearInterval(this.timer)
+        this.btnCaptcha = SEND_CAPTCHA
+        this.disableCaptcha = false
+      }
+    },
     onSubmit (email, password) {
       this.dismissError()
+
+      if (this.captcha.length < 4) {
+        alert('Error: wrong format of captcha')
+        return
+      }
 
       let user = {email, password, active: false}
       if (this.openid) {
