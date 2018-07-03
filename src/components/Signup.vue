@@ -13,7 +13,7 @@
         <a class="close" href="javascript://" @click.prevent="dismissError">dismiss</a>
       </div>
 
-      <form class="form" method="post" @submit.prevent="onSubmit(email, password)">
+      <form class="form" method="post" @submit.prevent="onSubmit(email, password, mobile, captcha)">
         <fieldset>
           <input class="block"
             v-model="email"
@@ -34,20 +34,20 @@
 
         <fieldset>
           <input class="block"
-                 v-model="mobile"
-                 type="text"
-                 name="mobile"
-                 placeholder="mobile"
-                 required>
+             v-model="mobile"
+             type="text"
+             name="mobile"
+             placeholder="mobile"
+             required>
         </fieldset>
 
         <fieldset>
           <input class="block"
-                 v-model="captcha"
-                 type="text"
-                 name="captcha"
-                 placeholder="captcha"
-                 required>
+             v-model="captcha"
+             type="text"
+             name="captcha"
+             placeholder="captcha"
+             required>
           <button type="button" class="button button-primary" :disabled="disableCaptcha" @click="sendCaptcha">
             {{btnCaptcha}}
           </button>
@@ -133,7 +133,7 @@ export default {
         this.disableCaptcha = false
       }
     },
-    onSubmit (email, password) {
+    onSubmit (email, password, mobile, captcha) {
       this.dismissError()
 
       if (this.captcha.length < 4) {
@@ -141,7 +141,7 @@ export default {
         return
       }
 
-      let user = {email, password, active: false}
+      let user = {email, password, mobile, code: captcha, active: false}
       if (this.openid) {
         user.openid = this.openid
       }
@@ -151,12 +151,18 @@ export default {
         .then(response => this.authenticate({strategy: 'local', email, password}))
         // Just use the returned error instead of mapping it from the store.
         .catch(error => {
-          // Convert the error to a plain object and add a message.
-          let type = error.errorType
           error = Object.assign({}, error)
-          error.message = (type === 'uniqueViolated')
-            ? 'That email address is unavailable.'
-            : 'An error prevented signup.'
+          console.error('CreateUser err:', error)
+          if (error.MyErr) {
+            error.message = error.MyErr.msg
+          } else {
+            // Convert the error to a plain object and add a message.
+            let type = error.errorType
+            error = Object.assign({}, error)
+            error.message = (type === 'uniqueViolated')
+              ? 'That email address is unavailable.'
+              : 'An error prevented signup.'
+          }
           this.error = error
         })
     },
