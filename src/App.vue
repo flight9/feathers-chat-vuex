@@ -20,64 +20,56 @@ export default {
   watch: {
     // When the user is set, redirect to the Chat page.
     // ZM: Add router condition here for wechat
-    user (newVal) {
-      console.log('User newVal:', newVal)
-      if (!newVal) {
+    user (newUser) {
+      console.log('User newVal:', newUser)
+      if (!newUser) {
         // After logout
         this.$router.replace({name: 'Login'})
       } else {
-        // TODO: Mike: Do jsconfig ONLY after user logged in && ONLY inside Wechat
-        // move this.wxStartJsconfig() here
-
-        if (newVal) { // TODO: By user.active
-          this.$router.replace({name: 'Chat'})
+        // After login
+        if (this.inWechat()) {
+          if (newUser.bind_status === 'bound') {
+            // bound user
+            this.$router.replace({name: 'Chat'}) // or dashboard for wechat
+            console.log('Router redirects to Chat for bound user.')
+          } else {
+            // createdByOauth user
+            this.$router.replace({name: 'SignupOauth'})
+            console.log('Router redirects to SignupOauth for createdByOauth user.')
+          }
         } else {
-          this.$router.replace({name: 'Wait'}) // for block user
+          this.$router.replace({name: 'Chat'})
         }
 
-        // Future redirect simulating
-        console.info('App user appVersion:', newVal.appVersion)
-        alert('appVersion' + newVal.appVersion)
+        // TODO: Mike: Do jsconfig ONLY after user logged in && ONLY inside Wechat
+
+        // TODO Future redirect simulating
+        // console.info('App user appVersion:', newUser.appVersion)
+        // alert('appVersion' + newUser.appVersion)
       }
     }
   },
   mounted () {
-    // If using quasar, this.$route can't get correct route info, you should use
-    // the method written by LinusBorg to watch and get it.
-    // ref: https://forum.vuejs.org/t/problem-this-router-currentroute-can-not-get-current-route/32001/5
-    const isRouteLaunch = (this.$route.name === 'Launch')
-    console.info('App isRouteLaunch:', isRouteLaunch)
-    console.info('App this route:', this.$route) // or this.$router.currentRoute
-
-    if (!isRouteLaunch) {
-      console.info('App invoke authenticate()')
-      this.$store.dispatch('auth/authenticate').catch(error => {
-        if (!error.message.includes('Could not find stored JWT')) {
-          console.error(error)
+    console.info('App invoke authenticate()')
+    this.$store.dispatch('auth/authenticate').catch(error => {
+      if (!error.message.includes('Could not find stored JWT')) {
+        console.error(error)
+        if (this.inWechat) {
+          // TODO redirect to server /auth/wechat to start OAuth process
         }
-      }).then(res => {
-        console.log('App auth res:', res)
-        // In wechat, should we need automatically jump to start launch?
-        // Optinon 1 to use code below:
-        // If we use codes below to jump, then remove the authenticate() invoking
-        // in Launch.vue, and make wechat menu entry pointed to '/' not 'Launch' route.
-        // Option 2 to make wechat menu entry pointed to
-        // '/launch?code=start' and invoke app.authenticate() there too(without code below).
-        // Codes below may cause a problem when wx server callback(like refresh):
-        // it jumps again to Launch,
-        // isRouteLaunch above is used to solve that problem.
-        const inWechat = /micromessenger/.test(navigator.userAgent.toLowerCase())
-        if (!res && inWechat) {
-          // this.$router.replace({name: 'Launch', query: {code: 'start'}})
-        }
-      })
-    } else {
-      console.info('App skip authenticate()')
-    }
+      }
+    }).then(res => {
+      console.log('App auth result:', res)
+      // Authenticate from wechat oauth may always be successful, but that doesn't mean
+      //  it's a bound user or a new one. Go above to check logined user's bind_status.
+    })
 
-    this.wxStartJsconfig()
+    // this.wxStartJsconfig()
   },
   methods: {
+    inWechat () {
+      return /micromessenger/.test(navigator.userAgent.toLowerCase())
+    },
     wxStartJsconfig () {
       var params = {
         query: {

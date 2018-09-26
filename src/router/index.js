@@ -6,6 +6,9 @@ import Signup from '@/components/Signup'
 import Chat from '@/components/Chat/Chat'
 import Launch from '@/components/Launch'
 import Wait from '@/components/Wait'
+import oauthSuccess from '@/components/oauth-success'
+import signupOauth from '@/components/signup-oauth'
+import bindOauth from '@/components/bind-oauth'
 
 Vue.use(Router)
 
@@ -16,6 +19,9 @@ export default new Router({
     { path: '/signup', name: 'Signup', component: Signup, props: true },
     { path: '/chat', name: 'Chat', component: Chat },
     { path: '/wx', name: 'Launch', component: Launch },
-    { path: '/wait', name: 'Wait', component: Wait }
+    { path: '/wait', name: 'Wait', component: Wait },
+    { path: '/oauth-success', name: 'oauthSuccess', component: oauthSuccess },
+    { path: '/signup-oauth', name: 'SignupOauth', component: signupOauth },
+    { path: '/bind-oauth', name: 'BindOauth', component: bindOauth }
   ]
 })

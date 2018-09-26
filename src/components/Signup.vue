@@ -160,7 +160,7 @@ export default {
             let type = error.errorType
             error = Object.assign({}, error)
             error.message = (type === 'uniqueViolated')
-              ? 'That email address is unavailable.'
+              ? 'That email or mobile is unavailable.'
               : 'An error prevented signup.'
           }
           this.error = error
