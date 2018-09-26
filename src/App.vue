@@ -62,8 +62,10 @@ export default {
     this.$store.dispatch('auth/authenticate').catch(error => {
       if (!error.message.includes('Could not find stored JWT')) {
         console.error(error)
+      } else {
         if (this.inWechat) {
-          // TODO redirect to server /auth/wechat to start OAuth process
+          // redirect to server /auth/wechat to start OAuth process
+          window.location.href = 'http://localhost:3030/auth/wechat'
         }
       }
     }).then(res => {
