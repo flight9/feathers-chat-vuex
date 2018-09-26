@@ -5,8 +5,8 @@ import socketio from 'feathers-socketio'
 import auth from 'feathers-authentication-client'
 import io from 'socket.io-client'
 
-const socket = io('http://localhost:3030', {transports: ['websocket']}) // server for local test
-// const socket = io('http://tri.s1.natapp.cc', {transports: ['websocket']}) // server for wechat client
+// const socket = io('http://localhost:3030', {transports: ['websocket']}) // server from local test
+const socket = io('http://trisrv.s1.natapp.cc', {transports: ['websocket']}) // server from phone client
 
 const feathersClient = feathers()
   .configure(hooks())
