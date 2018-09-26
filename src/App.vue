@@ -24,7 +24,9 @@ export default {
       console.log('User newVal:', newUser)
       if (!newUser) {
         // After logout
-        this.$router.replace({name: 'Login'})
+        if (!this.inWechat()) {
+          this.$router.replace({name: 'Login'})
+        }
       } else {
         // After login
         if (this.inWechat()) {
@@ -32,8 +34,14 @@ export default {
             // bound user
             this.$router.replace({name: 'Chat'}) // or dashboard for wechat
             console.log('Router redirects to Chat for bound user.')
-          } else {
+          } else if (newUser.bind_status === 'createdByOauth') {
             // createdByOauth user
+            let oauthUserJwt = window.localStorage.getItem('feathers-jwt')
+            window.localStorage.setItem('wechat-profile', JSON.stringify(newUser.wechat))
+            window.localStorage.setItem('oauth-user-id', newUser._id)
+            window.localStorage.setItem('oauth-user-jwt', oauthUserJwt)
+
+            // rediret
             this.$router.replace({name: 'SignupOauth'})
             console.log('Router redirects to SignupOauth for createdByOauth user.')
           }
@@ -61,7 +69,7 @@ export default {
     }).then(res => {
       console.log('App auth result:', res)
       // Authenticate from wechat oauth may always be successful, but that doesn't mean
-      //  it's a bound user or a new one. Go above to check logined user's bind_status.
+      //  if it's a bound user or a new one. Go above to check logined user's bind_status.
     })
 
     // this.wxStartJsconfig()

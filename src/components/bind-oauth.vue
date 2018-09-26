@@ -52,6 +52,8 @@ export default {
     }
   },
   mounted () {
+    // enusre logout
+    this.logout()
   },
   methods: {
     dismissError () {
@@ -61,17 +63,17 @@ export default {
     async onSubmit (email, password) {
       this.dismissError()
 
-      console.log('Bind auth.user before', this.user)
-      if (!this.user) {
-        alert('No auth user!')
+      // get wechatProfile
+      const wechatProfile = JSON.parse(window.localStorage.getItem('wechat-profile'))
+      console.log('get wechatProfile', wechatProfile)
+      if (!wechatProfile || !wechatProfile.openid) {
+        alert('No wechat profile!')
         return
       }
 
-      var cert = {strategy: 'local', email, password, bindOauth: true, oauthUserId: this.user._id}
-
-      await this.logout()
-      await this.authenticate(cert)
-        // Just use the returned error instead of mapping it from the store.
+      // verify username/password and login
+      const cert = { strategy: 'local', email, password }
+      let jwtToken = await this.authenticate(cert)
         .catch(error => {
           // Convert the error to a plain object and add a message.
           console.log('Bind err:', error)
@@ -82,9 +84,45 @@ export default {
           }
           this.error = error
         })
+      console.log('test creating jwt before bind', jwtToken)
+      if (!jwtToken) {
+        alert('Incorrect email or password!')
+        return
+      }
+
+      // check double-bound
+      if (this.user.bind_status === 'bound' || this.user.openid) {
+        alert('This user has been bound before!')
+        this.logout() // TODO BUG will redirect to Chat page, not be back(showing blank)
+        return
+      }
+
+      // find & update wx.properties to binding account
+      let bindUserId = this.user._id
+      console.log('bindUserId', bindUserId)
+      let data = {
+        bind_status: 'bound',
+        openid: wechatProfile.openid,
+        wechat: wechatProfile
+      }
+      let patchedUser = await this.patchUser([bindUserId, data])
+      console.log('patchedUser after binding', patchedUser)
+
+      // delete oauthUser
+      let oauthUserId = window.localStorage.getItem('oauth-user-id')
+      let deletedUser = await this.removeUser(oauthUserId)
+      console.log('deletedUser after binding', deletedUser)
+
+      // re-login to redirect
+      await this.logout()
+      await this.authenticate(cert)
     },
     ...mapMutations('auth', {
       clearAuthenticateError: 'clearAuthenticateError'
+    }),
+    ...mapActions('users', {
+      patchUser: 'patch',
+      removeUser: 'remove'
     }),
     ...mapActions('auth', ['authenticate', 'logout'])
   }

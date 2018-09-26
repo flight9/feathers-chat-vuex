@@ -66,17 +66,18 @@ export default {
       error: undefined
     }
   },
-  props: {
-    openid: {
-      default: undefined
-    }
-  },
   computed: {
     user () {
       return this.$store.state.auth.user
     }
   },
   mounted () {
+    // enusre login
+    if (!this.user) {
+      const oauthUserJwt = window.localStorage.getItem('oauth-user-jwt')
+      const cert = { strategy: 'jwt', accessToken: oauthUserJwt }
+      this.authenticate(cert)
+    }
   },
   methods: {
     dismissError () {
@@ -86,11 +87,15 @@ export default {
     async onSubmit (email, password, displayName) {
       this.dismissError()
 
-      console.log('Signup auth.user before', this.user)
+      // check oauth user
       if (!this.user) {
-        alert('No auth user!')
+        alert('No oauth user!')
         return
       }
+
+      // get oauthUserJwt
+      const oauthUserJwt = window.localStorage.getItem('oauth-user-jwt')
+      const cert = { strategy: 'jwt', accessToken: oauthUserJwt }
 
       // collect data
       let data = {
@@ -101,7 +106,7 @@ export default {
       }
 
       // update user
-      let updatedUser = await this.patchUser([this.user._id, data, {}])
+      let updatedUser = await this.patchUser([this.user._id, data])
         .catch(error => {
           // copy error
           error = Object.assign({}, error)
@@ -119,10 +124,13 @@ export default {
           this.error = error
         })
       console.log('auth.user after', this.user, updatedUser)
-      // TODO auth.user properties may not get updated
+      if (!updatedUser) {
+        return
+      }
 
-      // redirect
-      this.$router.replace({name: 'Chat'})
+      // re-login to redirect
+      await this.logout()
+      await this.authenticate(cert)
     },
     ...mapActions('users', {
       patchUser: 'patch'
@@ -131,7 +139,8 @@ export default {
       clearPatchError: 'clearPatchError'
     }),
     ...mapActions('auth', [
-      'authenticate'
+      'authenticate',
+      'logout'
     ])
   }
 }
