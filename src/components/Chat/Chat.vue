@@ -51,17 +51,18 @@ export default {
       'logout'
     ])
   },
-  created () {
+  async created () {
     if (!this.user) {
       return this.$router.replace({name: 'Login'})
     }
     // Query users from Feathers
-    this.findUsers({
+    let findUsers = await this.findUsers({
       query: {
         $sort: {email: 1},
         $limit: 25
       }
     })
+    console.log('Chat findUsers', findUsers, 'total', findUsers.total)
     // Query messages from Feathers
     this.findMessages({
       query: {
