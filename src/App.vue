@@ -65,7 +65,8 @@ export default {
       } else {
         if (this.inWechat) {
           // redirect to server /auth/wechat to start OAuth process
-          window.location.href = 'http://localhost:3030/auth/wechat'
+          // window.location.href = 'http://localhost:3030/auth/wechat'
+          window.location.href = 'http://trisrv.s1.natapp.cc/auth/wechat' // for test on phone
         }
       }
     }).then(res => {
